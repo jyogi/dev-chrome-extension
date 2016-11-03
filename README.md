@@ -14,3 +14,9 @@ Chrome 装上这个插件以后能够：
 ## 更新日志
  
  [CHANGELOG.md](./CHANGELOG.md)
+ 
+## 产品路线图
+
+ [2016-2017](https://github.com/cloudinsight/dev-chrome-extension/projects/1)
+
+![](./docs/keep-calm-and-try-cloudinsight.png)
