@@ -36,5 +36,8 @@
     "uuid": "^2.0.3",
     "webpack": "^1.13.1",
     "wilddog": "^0.6.4"
+  },
+  "dependencies": {
+    "wilddog": "^2.1.2"
   }
 }

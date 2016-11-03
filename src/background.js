@@ -1,20 +1,13 @@
 import { parse } from 'url';
-import Wilddog from 'wilddog';
+import wilddog from 'wilddog';
 import moment from 'moment';
 import ga from './ga';
 import Raven from 'raven-js';
+import { syncURL, sentryURL, locale } from '../config';
+
+// 常量部分
 
 const details = chrome.app.getDetails();
-
-Raven.config('https://1c3c1427cc934c8dac02fa873e244754@sentry.cloudinsight.cc/8', {
-  release: details.version,
-  environment: chrome.app.getIsInstalled() ? 'Production' : 'Development'
-}).install()
-
-ga();
-moment.locale('zh-cn');
-
-const ref = new Wilddog('https://h0r0rop9h6vu9k8oxge5.wilddogio.com/versions');
 const filter = {
   urls: [
     "*://cloud.oneapm.com/*",
@@ -25,15 +18,40 @@ const spec = ['requestHeaders', "blocking"];
 const CHOOSE_FED = 'choose_fed_version';
 const LOCAL = '127.0.0.1:8000';
 
+// 初始化各个组件
+
+wilddog.initializeApp({
+  syncURL
+});
+
+Raven.config(sentryURL, {
+  release: details.version,
+  environment: chrome.app.getIsInstalled() ? 'Production' : 'Development'
+}).install();
+
+moment.locale(locale);
+
+// 发送一个 hit
+
+ga();
+
+// 连接到 Wilddog
+
+const ref = wilddog.sync().ref('/versions');
+
 let versionsMap = {};
+
+/**
+ * 同步数据和菜单
+ */
 const syncContextMenus = () => {
   ga({
     t: 'event',
     ec: 'contextMenu',
     ea: 'sync'
   });
-  chrome.contextMenus.removeAll(()=> {
 
+  chrome.contextMenus.removeAll(()=> {
     const currentFed = localStorage['fed'];
 
     if (currentFed === LOCAL) {
@@ -88,6 +106,8 @@ const syncContextMenus = () => {
   })
 };
 
+// 更新数据
+
 ref.on('value', (snapshot) => {
   ga({
     t: 'event',
@@ -97,6 +117,8 @@ ref.on('value', (snapshot) => {
   versionsMap = snapshot.val();
   syncContextMenus();
 });
+
+// 检测到新的版本发布
 
 ref.on('child_added', (snapshot) => {
   const newNode = snapshot.val();
@@ -122,6 +144,8 @@ ref.on('child_added', (snapshot) => {
   }
 });
 
+// 拦截满足 filter 条件的的 Web 请求
+
 chrome.webRequest.onBeforeSendHeaders.addListener(detail => {
   const fed = localStorage['fed'];
   if (fed && fed.length) {
@@ -141,6 +165,8 @@ chrome.webRequest.onBeforeSendHeaders.addListener(detail => {
     requestHeaders: detail.requestHeaders
   }
 }, filter, spec);
+
+// 监听点击事件
 
 chrome.contextMenus.onClicked.addListener((info, tabs) => {
   const target = versionsMap[info.menuItemId];
@@ -176,14 +202,15 @@ chrome.contextMenus.onClicked.addListener((info, tabs) => {
   }
 });
 
-chrome.runtime.onMessage.addListener(
-  function (request, sender, sendResponse) {
-    console.log(sender.tab ? "from a content script:" + sender.tab.url : "from the extension");
-    if (request === "get_info") {
-      sendResponse({
-        fed: localStorage['fed'],
-        versionsMap
-      })
-    }
-  });
+// 接受 contentScript 的查询
+
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+  console.log(sender.tab ? "from a content script:" + sender.tab.url : "from the extension");
+  if (request === "get_info") {
+    sendResponse({
+      fed: localStorage['fed'],
+      versionsMap
+    })
+  }
+});
 
