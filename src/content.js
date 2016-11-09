@@ -23,3 +23,5 @@ const onFedResponse = ({ versionsMap, fed }) => {
 
 // 发送查询请求
 chrome.runtime.sendMessage('get_info', onFedResponse);
+
+

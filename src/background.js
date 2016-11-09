@@ -16,7 +16,10 @@ const filter = {
 };
 const spec = ['requestHeaders', "blocking"];
 const CHOOSE_FED = 'choose_fed_version';
+const LOCATION = 'location_clean';
 const LOCAL = '127.0.0.1:8000';
+const TIAOSHI = 'tiaoshi';
+const TIAOSHI1 = 'tiaoshi1';
 
 // 初始化各个组件
 
@@ -53,7 +56,6 @@ const syncContextMenus = () => {
 
   chrome.contextMenus.removeAll(()=> {
     const currentFed = localStorage['fed'];
-
     if (currentFed === LOCAL) {
       chrome.browserAction.setBadgeText({
         text: 'dev'
@@ -67,6 +69,24 @@ const syncContextMenus = () => {
     chrome.contextMenus.create({
       id: CHOOSE_FED,
       title: '选择前端版本',
+      contexts: ['browser_action']
+    });
+
+    chrome.contextMenus.create({
+      id: TIAOSHI,
+      title:'进入调试模式',
+      contexts: ['browser_action']
+    });
+
+    chrome.contextMenus.create({
+      id: TIAOSHI1,
+      title:'取消调试模式',
+      contexts: ['browser_action']
+    });
+
+    chrome.contextMenus.create({
+      id: LOCATION,
+      title: '版本清理',
       contexts: ['browser_action']
     });
 
@@ -170,14 +190,21 @@ chrome.webRequest.onBeforeSendHeaders.addListener(detail => {
 
 chrome.contextMenus.onClicked.addListener((info, tabs) => {
   const target = versionsMap[info.menuItemId];
-
+  console.info(target);
   ga({
     t: 'event',
     ec: 'contextMenu',
     ea: 'click',
     el: (target && target.URL ) || info.menuItemId
   });
+  if (info.menuItemId == TIAOSHI) {
+    chrome.tabs.executeScript(null, {code:"document.body.setAttribute('debuging','true');"});
+    return false;
+  }
 
+  if (info.menuItemId == TIAOSHI1) {
+    chrome.tabs.reload(tabs.id);
+  }
   switch (info.menuItemId) {
     case 'none':
       delete localStorage.fed;
@@ -186,6 +213,9 @@ chrome.contextMenus.onClicked.addListener((info, tabs) => {
     case 'dev':
       localStorage.fed = LOCAL;
       delete localStorage.description;
+      break;
+    case LOCATION:
+      chrome.windows.create({url:'https://cloudinsight.github.io/dev-version-management/'});
       break;
     default:
       if (target) {
