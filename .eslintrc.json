@@ -1,9 +1,11 @@
 {
   "extends": "airbnb",
   "rules": {
-    "linebreak-style": 0
+    "linebreak-style": 0,
+    "no-console": 0
   },
   "globals": {
-    "chrome": 1
+    "chrome": 1,
+    "localStorage": 1
   }
 }

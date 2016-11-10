@@ -197,12 +197,12 @@ chrome.contextMenus.onClicked.addListener((info, tabs) => {
     ea: 'click',
     el: (target && target.URL) || info.menuItemId,
   });
-  if (info.menuItemId == TIAOSHI) {
+  if (info.menuItemId === TIAOSHI) {
     chrome.tabs.executeScript(null, { code: "document.body.setAttribute('debuging','true');" });
-    return false;
+    return;
   }
 
-  if (info.menuItemId == TIAOSHI1) {
+  if (info.menuItemId === TIAOSHI1) {
     chrome.tabs.reload(tabs.id);
   }
   switch (info.menuItemId) {
