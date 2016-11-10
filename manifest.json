@@ -14,7 +14,6 @@
   "permissions": [
     "*://*.oneapm.com/*",
     "*://*.cloudinsight.cc/*",
-    "*://*.cloud.cc/*",
     "https://h0r0rop9h6vu9k8oxge5.wilddogio.com/*",
     "http://www.google-analytics.com/",
     "alarms",
@@ -23,15 +22,13 @@
     "webRequestBlocking",
     "contextMenus",
     "tabs",
-    "notifications",
-    "debugger"
+    "notifications"
   ],
   "content_scripts": [
     {
       "matches": [
         "*://*.oneapm.com/*",
-        "*://*.cloudinsight.cc/*",
-        "*://*.cloud.cc/*"
+        "*://*.cloudinsight.cc/*"
       ],
       "js": [
         "lib/content.js"
