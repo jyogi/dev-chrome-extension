@@ -13,10 +13,9 @@ const url = 'http://www.google-analytics.com/collect';
  * @param options
  */
 const ga = (options = {}) => {
-
   // 读取本地存储的 CID
   chrome.storage.local.get('cid', ({
-    cid = uuid.v4()
+    cid = uuid.v4(),
   }) => {
     const {
       t = 'screenview',
@@ -33,15 +32,14 @@ const ga = (options = {}) => {
       cd: window.location.pathname, // current screen
       ul: chrome.i18n.getUILanguage(), // language
       cid,
-      ...others
+      ...others,
     });
 
     // 设置 CID
     chrome.storage.local.set({
-      cid
+      cid,
     });
   });
-
-}
+};
 
 export default ga;
