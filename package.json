@@ -5,7 +5,7 @@
   "main": "lib/background.js",
   "scripts": {
     "eslint": "eslint --fix --ext=js,jsx ./src ./webpack.config.js ./config.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha",
     "dev": "webpack -w",
     "build": "rimraf lib && rimraf extension.zip && NODE_ENV=production webpack -p && zip -9 -r --exclude=*.git* --exclude=*node_modules* --exclude=*src* --exclude=*.idea* extension.zip ."
   },
@@ -34,16 +34,15 @@
     "eslint-plugin-import": "^2.2.0",
     "eslint-plugin-jsx-a11y": "^2.2.3",
     "eslint-plugin-react": "^6.6.0",
-    "rimraf": "^2.5.2",
-    "webpack": "^1.13.1"
-  },
-  "dependencies": {
     "jquery": "^3.1.0",
+    "mocha": "^3.1.2",
     "moment": "^2.14.1",
     "raven-js": "^3.7.0",
     "react": "^15.1.0",
     "react-dom": "^15.1.0",
-    "wilddog": "^2.1.2",
-    "uuid": "^2.0.3"
+    "rimraf": "^2.5.2",
+    "uuid": "^2.0.3",
+    "webpack": "^1.13.1",
+    "wilddog": "^2.1.2"
   }
 }

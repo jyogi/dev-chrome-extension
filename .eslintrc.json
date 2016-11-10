@@ -7,9 +7,10 @@
     "import/no-extraneous-dependencies": 0
   },
   "globals": {
-    "chrome": 1,
-    "localStorage": 1,
-    "window": 1,
-    "document": 1
+    "chrome": true
+  },
+  "env": {
+    "browser": true,
+    "mocha": true
   }
 }
