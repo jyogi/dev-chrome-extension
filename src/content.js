@@ -4,7 +4,7 @@
  * @param versionsMap
  * @param fed
  */
-const onFedResponse = ({ versionsMap, fed }) => {
+const onFedResponse = ({ fed }) => {
   // 检查当前页面 fed 是否生效
   const link = document.querySelector('link[rel*=icon]');
   if (link && link.href.indexOf(`${fed}/favicon.ico`) > 0) {

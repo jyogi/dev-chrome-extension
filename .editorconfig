@@ -6,7 +6,7 @@ root = true
 [Makefile]
 indent_style = tab
 
-[*.{js,md}]
+[*.{js,md,jsx}]
 charset = utf-8
 indent_style = space
 indent_size = 2

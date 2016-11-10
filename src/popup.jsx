@@ -4,6 +4,7 @@ import ga from './ga';
 
 ga();
 const element = document.createElement('div');
+
 const APP = (props) => {
   if (!props.URL) {
     return (<div>
@@ -19,6 +20,7 @@ const APP = (props) => {
           <td>
             <a
               target="_blank"
+              rel="noopener noreferrer"
               href={`https://${props.URL}/index.html`}
             >
               { props.URL }
@@ -30,6 +32,7 @@ const APP = (props) => {
           <td>
             <a
               target="_blank"
+              rel="noopener noreferrer"
               href={`http://git.oneapm.me/cloud/fed-ci/commit/${props.GIT_COMMIT}`}
             >
               { props.GIT_COMMIT.slice(0, 8) }
@@ -45,6 +48,7 @@ const APP = (props) => {
           <td>
             <a
               target="_blank"
+              rel="noopener noreferrer"
               href={props.BUILD_URL}
             >
               { props.BUILD_ID }</a>
@@ -54,6 +58,15 @@ const APP = (props) => {
     </table>
   </div>);
 };
+
+APP.propTypes = {
+  URL: React.PropTypes.string,
+  GIT_COMMIT: React.PropTypes.string,
+  GIT_BRANCH: React.PropTypes.string,
+  BUILD_URL: React.PropTypes.string,
+  BUILD_ID: React.PropTypes.string
+};
+
 document.body.appendChild(element);
 
 let description = null;
@@ -61,7 +74,7 @@ let description = null;
 try {
   description = JSON.parse(localStorage.description);
 } catch (e) {
-
+  console.error(e);
 }
 
 render(<APP {...description} />, element);

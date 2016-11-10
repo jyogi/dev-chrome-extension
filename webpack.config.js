@@ -2,22 +2,22 @@ const webpack = require('webpack');
 
 module.exports = {
   entry: {
-    background: "./src/background.js",
-    popup: "./src/popup.js",
-    content: "./src/content.js"
+    background: './src/background.js',
+    popup: './src/popup.jsx',
+    content: './src/content.js'
   },
   resolve: {
-    extensions: ['', '.js', '.es6']
+    extensions: ['', '.js', '.jsx']
   },
   output: {
-    path: "lib",
-    filename: "[name].js"
+    path: 'lib',
+    filename: '[name].js'
   },
   module: {
     loaders: [
       {
-        test: /.js$/,
-        loader: "babel"
+        test: /.(js|jsx)$/,
+        loader: 'babel'
       }
     ]
   },
@@ -26,4 +26,4 @@ module.exports = {
       'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
     })
   ]
-}
+};

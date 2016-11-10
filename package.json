@@ -4,7 +4,7 @@
   "description": "cloudinsight",
   "main": "lib/background.js",
   "scripts": {
-    "eslint": "eslint --ext=js ./src",
+    "eslint": "eslint --fix --ext=js,jsx ./src ./webpack.config.js ./config.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "webpack -w",
     "build": "rimraf lib && rimraf extension.zip && NODE_ENV=production webpack -p && zip -9 -r --exclude=*.git* --exclude=*node_modules* --exclude=*src* --exclude=*.idea* extension.zip ."
