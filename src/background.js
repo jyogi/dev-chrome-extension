@@ -1,19 +1,16 @@
 import { parse } from 'url';
 import wilddog from 'wilddog';
-import moment from 'moment';
 import Raven from 'raven-js';
 
-import { syncURL, sentryURL, locale } from '../config';
+import { syncURL, sentryURL, filterURLs } from '../config';
 import ga from './ga';
+import showMessage from './lib/showMessage';
 
 // 常量部分
 
 const details = chrome.app.getDetails();
 const filter = {
-  urls: [
-    '*://cloud.oneapm.com/*',
-    '*://*.cloudinsight.cc/*',
-  ],
+  urls: filterURLs
 };
 const spec = ['requestHeaders', 'blocking'];
 const CHOOSE_FED = 'choose_fed_version';
@@ -32,8 +29,6 @@ Raven.config(sentryURL, {
   release: details.version,
   environment: chrome.app.getIsInstalled() ? 'Production' : 'Development',
 }).install();
-
-moment.locale(locale);
 
 // 发送一个 hit
 
@@ -145,22 +140,13 @@ ref.on('child_added', (snapshot) => {
   const newNode = snapshot.val();
   // 如果是 1 小时之内的新版本就显示一个提示
   if (Date.now() - newNode.BUILD_TIME < 3600000) {
-    const title = `新版本 #${newNode.BUILD_ID}`;
-
     ga({
       t: 'event',
       ec: 'notifications',
       ea: 'create',
-      el: title,
+      el: `新版本 #${newNode.BUILD_ID}`,
     });
-
-    chrome.notifications.create({
-      type: 'basic',
-      title,
-      message: newNode.GIT_BRANCH,
-      contextMessage: moment(newNode.BUILD_TIME).fromNow(),
-      iconUrl: 'notification.png',
-    });
+    showMessage(newNode);
   }
 });
 
