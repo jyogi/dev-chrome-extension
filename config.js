@@ -5,3 +5,5 @@ export const filterURLs = [
   '*://cloud.oneapm.com/*',
   '*://*.cloudinsight.cc/*',
 ];
+export const gaID = 'UA-79575996-6';
+export const gaProtocolURL = 'http://www.google-analytics.com/collect';

@@ -1,9 +1,8 @@
 import $ from 'jquery';
 import uuid from 'uuid';
+import { gaID, gaProtocolURL } from '../config';
 
 const details = chrome.app.getDetails();
-const tid = 'UA-79575996-6';
-const url = 'http://www.google-analytics.com/collect';
 
 /**
  * Google Analytics Measurement Protocol 的简易地封装
@@ -22,9 +21,9 @@ const ga = (options = {}) => {
       ...others
     } = options;
 
-    $.post(url, {
+    $.post(gaProtocolURL, {
       v: 1,  // 版本
-      tid, // UA Property ID
+      tid: gaID, // UA Property ID
       t, // hit
       an: details.name, // application name
       aid: details.id, // application id
