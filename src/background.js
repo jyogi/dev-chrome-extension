@@ -4,31 +4,22 @@ import Raven from 'raven-js';
 
 import { syncURL, sentryURL, filterURLs } from '../config';
 import ga from './ga';
-import showMessage from './lib/showMessage';
+import Plugin from './modules/Plugin';
+import syncContextMenus from './lib/syncContextMenus';
 
-// 常量部分
-
-const details = chrome.app.getDetails();
-const filter = {
-  urls: filterURLs
-};
-const spec = ['requestHeaders', 'blocking'];
-const CHOOSE_FED = 'choose_fed_version';
-const LOCATION = 'location_clean';
-const LOCAL = '127.0.0.1:8000';
-const TIAOSHI = 'tiaoshi';
-const TIAOSHI1 = 'tiaoshi1';
+// 報錯
+Raven.config(sentryURL, {
+  release: chrome.app.getDetails().version,
+  environment: chrome.app.getIsInstalled() ? 'Production' : 'Development',
+}).install();
 
 // 初始化各个组件
 
-wilddog.initializeApp({
+const plugin = new Plugin({
   syncURL,
+  filterURLs
 });
-
-Raven.config(sentryURL, {
-  release: details.version,
-  environment: chrome.app.getIsInstalled() ? 'Production' : 'Development',
-}).install();
+console.log(plugin);
 
 // 发送一个 hit
 
@@ -40,88 +31,6 @@ const ref = wilddog.sync().ref('/versions');
 
 let versionsMap = {};
 
-/**
- * 同步数据和菜单
- */
-const syncContextMenus = () => {
-  ga({
-    t: 'event',
-    ec: 'contextMenu',
-    ea: 'sync',
-  });
-
-  chrome.contextMenus.removeAll(() => {
-    const currentFed = localStorage.fed;
-    if (currentFed === LOCAL) {
-      chrome.browserAction.setBadgeText({
-        text: 'dev',
-      });
-    } else {
-      chrome.browserAction.setBadgeText({
-        text: '',
-      });
-    }
-
-    chrome.contextMenus.create({
-      id: CHOOSE_FED,
-      title: '选择前端版本',
-      contexts: ['browser_action'],
-    });
-
-    chrome.contextMenus.create({
-      id: TIAOSHI,
-      title: '进入调试模式',
-      contexts: ['browser_action'],
-    });
-
-    chrome.contextMenus.create({
-      id: TIAOSHI1,
-      title: '取消调试模式',
-      contexts: ['browser_action'],
-    });
-
-    chrome.contextMenus.create({
-      id: LOCATION,
-      title: '版本清理',
-      contexts: ['browser_action'],
-    });
-
-    chrome.contextMenus.create({
-      type: 'radio',
-      id: 'none',
-      title: 'default',
-      contexts: ['browser_action'],
-      parentId: CHOOSE_FED,
-      checked: !currentFed,
-    });
-
-    chrome.contextMenus.create({
-      type: 'radio',
-      id: 'dev',
-      title: LOCAL,
-      contexts: ['browser_action'],
-      parentId: CHOOSE_FED,
-      checked: currentFed === LOCAL,
-    });
-
-    Object.keys(versionsMap).forEach((id) => {
-      chrome.contextMenus.create({
-        type: 'radio',
-        id,
-        title: versionsMap[id].URL,
-        contexts: ['browser_action'],
-        parentId: CHOOSE_FED,
-        checked: currentFed === versionsMap[id].URL,
-      });
-      if (currentFed === versionsMap[id].URL) {
-        chrome.browserAction.setBadgeText({
-          text: versionsMap[id].BUILD_ID,
-        });
-      }
-    });
-  });
-};
-
 // 更新数据
 
 ref.on('value', (snapshot) => {
@@ -131,102 +40,51 @@ ref.on('value', (snapshot) => {
     ea: 'value',
   });
   versionsMap = snapshot.val();
-  syncContextMenus();
+  syncContextMenus(versionsMap);
 });
-
-// 检测到新的版本发布
-
-ref.on('child_added', (snapshot) => {
-  const newNode = snapshot.val();
-  // 如果是 1 小时之内的新版本就显示一个提示
-  if (Date.now() - newNode.BUILD_TIME < 3600000) {
-    ga({
-      t: 'event',
-      ec: 'notifications',
-      ea: 'create',
-      el: `新版本 #${newNode.BUILD_ID}`,
-    });
-    showMessage(newNode);
-  }
-});
-
-// 拦截满足 filter 条件的的 Web 请求
-
-chrome.webRequest.onBeforeSendHeaders.addListener((detail) => {
-  const fed = localStorage.fed;
-  if (fed && fed.length) {
-    ga({
-      t: 'event',
-      ec: 'setRequestHeader',
-      ea: 'fed',
-      el: fed,
-    });
-
-    detail.requestHeaders.push({
-      name: 'fed',
-      value: fed,
-    });
-  }
-  return {
-    requestHeaders: detail.requestHeaders,
-  };
-}, filter, spec);
 
 // 监听点击事件
 
-chrome.contextMenus.onClicked.addListener((info, tabs) => {
-  const target = versionsMap[info.menuItemId];
-  console.info(target);
-  ga({
-    t: 'event',
-    ec: 'contextMenu',
-    ea: 'click',
-    el: (target && target.URL) || info.menuItemId,
-  });
-  if (info.menuItemId === TIAOSHI) {
-    chrome.tabs.executeScript(null, { code: "document.body.setAttribute('debuging','true');" });
-    return;
-  }
-
-  if (info.menuItemId === TIAOSHI1) {
-    chrome.tabs.reload(tabs.id);
-  }
-  switch (info.menuItemId) {
-    case 'none':
-      delete localStorage.fed;
-      delete localStorage.description;
-      break;
-    case 'dev':
-      localStorage.fed = LOCAL;
-      delete localStorage.description;
-      break;
-    case LOCATION:
-      chrome.windows.create({ url: 'https://cloudinsight.github.io/dev-version-management/' });
-      break;
-    default:
-      if (target) {
-        localStorage.fed = target.URL;
-        localStorage.description = JSON.stringify(target);
-      } else {
-        console.info('%s has no target', info.menuItemId);
-        return;
-      }
-  }
-  syncContextMenus();
-  if (parse(tabs.url).hostname === 'cloud.oneapm.com') {
-    chrome.tabs.reload(tabs.id);
-  }
-});
-
-// 接受 contentScript 的查询
-
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  console.log(sender.tab ? `from a content script:${sender.tab.url}` : 'from the extension');
-  if (request === 'get_info') {
-    sendResponse({
-      fed: localStorage.fed,
-      versionsMap,
-    });
-  }
-});
-
+// chrome.contextMenus.onClicked.addListener((info, tabs) => {
+//   const target = versionsMap[info.menuItemId];
+//   console.info(target);
+//   ga({
+//     t: 'event',
+//     ec: 'contextMenu',
+//     ea: 'click',
+//     el: (target && target.URL) || info.menuItemId,
+//   });
+//   if (info.menuItemId === TIAOSHI) {
+//     chrome.tabs.executeScript(null, { code: "document.body.setAttribute('debuging','true');" });
+//     return;
+//   }
+//
+//   if (info.menuItemId === TIAOSHI1) {
+//     chrome.tabs.reload(tabs.id);
+//   }
+//   switch (info.menuItemId) {
+//     case 'none':
+//       delete localStorage.fed;
+//       delete localStorage.description;
+//       break;
+//     case 'dev':
+//       localStorage.fed = LOCAL;
+//       delete localStorage.description;
+//       break;
+//     case LOCATION:
+//       chrome.windows.create({ url: 'https://cloudinsight.github.io/dev-version-management/' });
+//       break;
+//     default:
+//       if (target) {
+//         localStorage.fed = target.URL;
+//         localStorage.description = JSON.stringify(target);
+//       } else {
+//         console.info('%s has no target', info.menuItemId);
+//         return;
+//       }
+//   }
+//   syncContextMenus();
+//   if (parse(tabs.url).hostname === 'cloud.oneapm.com') {
+//     chrome.tabs.reload(tabs.id);
+//   }
+// });
