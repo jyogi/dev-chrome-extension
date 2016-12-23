@@ -1,5 +1,5 @@
 import moment from 'moment';
-import { locale } from '../../config';
+import { locale } from '../../src/config/index';
 
 moment.locale(locale);
 

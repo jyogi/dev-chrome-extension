@@ -7,7 +7,7 @@
     "eslint": "eslint --fix --ext=js,jsx ./src ./webpack.config.js ./config.js",
     "test:coveralls": "npm run test && cat ./coverage/lcov.info | coveralls && rm -rf ./coverage",
     "test": "jest",
-    "dev": "webpack -w",
+    "dev": "webpack-dev-server -d",
     "build": "rimraf lib && rimraf extension.zip && NODE_ENV=production webpack -p && zip -9 -r --exclude=*.git* --exclude=*node_modules* --exclude=*src* --exclude=*.idea* extension.zip ."
   },
   "repository": {
@@ -43,15 +43,32 @@
     "eslint-plugin-import": "^2.2.0",
     "eslint-plugin-jsx-a11y": "^2.2.3",
     "eslint-plugin-react": "^6.6.0",
+    "immutable": "^3.8.1",
     "jest": "^18.0.0",
     "jquery": "^3.1.0",
     "moment": "^2.17.1",
     "raven-js": "^3.9.1",
     "react": "^15.4.1",
     "react-dom": "^15.4.1",
+    "redux": "^3.6.0",
+    "redux-actions": "^1.2.0",
     "rimraf": "^2.5.2",
+    "underscore": "^1.8.3",
     "uuid": "^3.0.1",
     "webpack": "^1.14.0",
+    "webpack-dev-server": "^1.16.2",
     "wilddog": "^2.3.10"
+  },
+  "dependencies": {
+    "bootstrap": "^3.3.7",
+    "css-loader": "^0.26.1",
+    "eslint-loader": "^1.6.1",
+    "file-loader": "^0.9.0",
+    "less": "^2.7.1",
+    "less-loader": "^2.2.3",
+    "react-bootstrap": "^0.30.7",
+    "react-redux": "^5.0.1",
+    "react-select": "^1.0.0-rc.2",
+    "style-loader": "^0.13.1"
   }
 }

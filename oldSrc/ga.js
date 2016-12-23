@@ -1,6 +1,6 @@
 import $ from 'jquery';
 import uuid from 'uuid';
-import { gaID, gaProtocolURL } from '../config';
+import { gaID, gaProtocolURL } from '../src/config/index';
 
 const details = chrome.app.getDetails();
 

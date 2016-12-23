@@ -1,7 +1,7 @@
 # Created by .ignore support plugin (hsz.mobi)
+.idea
+/coverage/
+/extension.zip
 /lib/
 /node_modules/
-/extension.zip
-.idea
 /npm-debug.log
-/coverage/
