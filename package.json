@@ -35,14 +35,14 @@
     "eslint-plugin-jsx-a11y": "^2.2.3",
     "eslint-plugin-react": "^6.6.0",
     "jquery": "^3.1.0",
-    "mocha": "^3.1.2",
-    "moment": "^2.14.1",
-    "raven-js": "^3.7.0",
-    "react": "^15.1.0",
-    "react-dom": "^15.1.0",
+    "mocha": "^3.2.0",
+    "moment": "^2.17.1",
+    "raven-js": "^3.9.1",
+    "react": "^15.4.1",
+    "react-dom": "^15.4.1",
     "rimraf": "^2.5.2",
-    "uuid": "^2.0.3",
-    "webpack": "^1.13.1",
-    "wilddog": "^2.1.2"
+    "uuid": "^3.0.1",
+    "webpack": "^1.14.0",
+    "wilddog": "^2.3.10"
   }
 }
