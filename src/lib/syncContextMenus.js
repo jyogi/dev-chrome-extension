@@ -60,7 +60,7 @@ const syncContextMenus = (versionsMap) => {
       contexts: ['browser_action'],
       parentId: CHOOSE_FED,
       checked: currentFed === LOCAL,
-      onclick(...args){
+      onclick(...args) {
         console.log(...args);
       }
     });
